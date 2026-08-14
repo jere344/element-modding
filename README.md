@@ -53,6 +53,9 @@ Keeps your account showing as present (green dot) as long as the app is open, in
 
 Adds a Giphy GIF picker button to the message composer to search GIFs and send them into the current room.
 
+<img width="1245" height="634" alt="image" src="https://github.com/user-attachments/assets/8716252f-2ef7-4479-afa6-c0abcd60f217" />
+
+
 To use it you need a (free) Giphy API key:
 
 1. Go to https://developers.giphy.com and sign in.
@@ -68,24 +71,35 @@ The key is stored locally in your browser's localStorage and never leaves your m
 <summary><b>Hide Room</b></summary>
 
 Right-click a room and choose 'Hide room' to remove it from the room list. Hidden rooms are saved locally and can be unhidden from a 'Hidden rooms' tab in Settings.
+
+<img width="357" height="426" alt="image" src="https://github.com/user-attachments/assets/ebaa5e13-e8b8-4cac-b66d-701112ee575d" />
+
 </details>
 
 <details>
 <summary><b>Message Logger</b></summary>
 
 Remembers message text locally and shows deleted messages in red, with a dismiss button that restores the grey 'Message deleted' placeholder.
+<img width="416" height="156" alt="image" src="https://github.com/user-attachments/assets/50f9e8c0-b44d-4d8c-b691-b9978a3ea781" />
+
 </details>
 
 <details>
 <summary><b>Modding Tab</b></summary>
 
 Adds a 'Modding' tab to the Settings dialog showing the mod platform version and the list of active patches.
+
+<img width="1028" height="866" alt="image" src="https://github.com/user-attachments/assets/e5e8504c-88ea-4967-8d3c-6af18b23523e" />
+
 </details>
 
 <details>
 <summary><b>My Activity</b></summary>
 
 Shows your own presence dot (online, away, offline or busy) on your profile picture in the top-left corner, matching the indicator shown on other users' avatars.
+
+<img width="187" height="97" alt="image" src="https://github.com/user-attachments/assets/d287c917-ffac-417a-9ba0-e27b507fd245" />
+
 </details>
 
 <details>
@@ -98,18 +112,29 @@ Removes the quick settings menu. Clicking the settings gear (bottom of the space
 <summary><b>Pin Rooms</b></summary>
 
 Pin/unpin rooms via the room right-click menu and show them as avatar buttons in the left sidebar, below the spaces.
+
+<img width="155" height="320" alt="image" src="https://github.com/user-attachments/assets/16b4ba15-502e-4b56-a829-b5c6404ce454" />
+
 </details>
 
 <details>
 <summary><b>Save Message</b></summary>
 
 Right-click a message to save it, and open a 'Saved messages' page from a new button in the left sidebar.
+
+<img width="141" height="120" alt="image" src="https://github.com/user-attachments/assets/617e53f3-3f3e-4f2e-9af3-cd8a9a8c5b1f" />
+<img width="1004" height="622" alt="image" src="https://github.com/user-attachments/assets/cb4a91b1-5a6b-445a-a579-1bb1977c34ed" />
+
+
 </details>
 
 <details>
 <summary><b>Themes</b></summary>
 
 Theme engine modeled after Vencord's theme system: apply and manage custom CSS themes (bundled, added by URL, or pasted)
+
+<img width="1055" height="866" alt="image" src="https://github.com/user-attachments/assets/0356add0-7b28-47b9-893f-7d7f4e9359d9" />
+
 </details>
 
 ## Uninstall
