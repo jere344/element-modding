@@ -1,0 +1,8 @@
+{
+  "id": "pin-favorites",
+  "name": "Pin Rooms",
+  "description": "Pin/unpin rooms via the room right-click menu and show them as avatar buttons in the left sidebar, below the spaces.",
+  "version": "1.1.0",
+  "author": "you",
+  "main": "index.js"
+}

@@ -1,0 +1,152 @@
+/**
+ * @name Vibrant Glass
+ * @author Kaynooo#8080
+ * @description Simple customizable glassmorphism theme (ported to Element Web).
+ * @version 1.2
+ * @source https://github.com/Kayno0o/vibrant-glass-theme
+ */
+
+/* ===== CUSTOMIZATION ==================================================
+   To change the background image, set --vg-bg-url to any direct image URL.
+   To tint the glass, change --vg-bg-color (an "R, G, B" triplet).
+   To make it more or less transparent, tweak --vg-opacity (0..1).
+   ====================================================================== */
+
+:root, body {
+    --vg-window-name: "Vibrant Glass";
+    --vg-window-name-color: rgb(255, 255, 255);
+
+    --vg-light-opacity: 0.2;
+    --vg-opacity: 0.5;
+    --vg-dark-opacity: 0.75;
+
+    --vg-bg-url: url('https://images.unsplash.com/photo-1557683316-973673baf926?w=1920&q=80');
+    --vg-bg-color: 0, 0, 0;
+
+    --vg-accent: rgb(72, 222, 233);
+    --vg-text: rgb(255, 255, 255);
+    --vg-text-secondary: rgb(204, 204, 204);
+    --vg-text-muted: rgb(187, 187, 187);
+    --vg-blur: 24px;
+
+    /* Precomputed glass fills. */
+    --vg-glass: rgba(var(--vg-bg-color), var(--vg-opacity));
+    --vg-glass-light: rgba(var(--vg-bg-color), var(--vg-light-opacity));
+    --vg-glass-dark: rgba(var(--vg-bg-color), var(--vg-dark-opacity));
+}
+
+/* ===== BACKGROUND ===== */
+html,
+body {
+    background: var(--vg-bg-url) center / cover no-repeat fixed !important;
+}
+
+#matrixchat,
+.mx_MatrixChat,
+.mx_MatrixChat_wrapper {
+    background: transparent !important;
+}
+
+/* ===== GLASS SURFACES ===== */
+.mx_RoomView,
+.mx_RoomView_body,
+.mx_LeftPanel,
+.mx_RightPanel,
+.mx_RoomHeader,
+.mx_RoomHeader_wrapper,
+.mx_MessageComposer,
+.mx_MessageComposer_wrapper,
+.mx_SendMessageComposer,
+.mx_UserMenu,
+.mx_Dialog,
+.mx_UserSettingsDialog,
+.mx_SpacePanel,
+.mx_RoomSublist,
+.mx_MemberList,
+.mx_BaseCard,
+.mx_RoomSearch,
+.mx_ScrollPanel,
+.mx_AutoHideScrollbar {
+    background-color: var(--vg-glass) !important;
+    backdrop-filter: blur(var(--vg-blur));
+    -webkit-backdrop-filter: blur(var(--vg-blur));
+}
+
+/* Inner scroll areas stay transparent so the glass doesn't stack too dark. */
+.mx_RoomView_body .mx_ScrollPanel,
+.mx_RoomList,
+.mx_RoomList .mx_AutoHideScrollbar,
+.mx_SpacePanel .mx_AutoHideScrollbar,
+.mx_MemberList .mx_AutoHideScrollbar,
+.mx_Dialog .mx_AutoHideScrollbar {
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* ===== SEMANTIC TOKENS =====
+   Element defines its Compound design tokens on the theme class applied to
+   <body> (cpd-theme-dark / cpd-theme-light), inside CSS cascade layers.
+   Overriding them here on :root, body (unlayered) wins over the layered
+   definitions, so every component that reads these variables turns to glass. */
+
+:root, body {
+    --cpd-color-bg-canvas-default: var(--vg-glass);
+    --cpd-color-bg-canvas-default-level-1: var(--vg-glass-light);
+    --cpd-color-bg-subtle-primary: var(--vg-glass-light);
+    --cpd-color-bg-subtle-secondary: var(--vg-glass-light);
+    --cpd-color-bg-subtle-secondary-level-0: var(--vg-glass-dark);
+
+    --cpd-color-bg-action-primary-rest: var(--vg-accent);
+    --cpd-color-bg-action-primary-hovered: var(--vg-accent);
+    --cpd-color-bg-action-primary-pressed: var(--vg-accent);
+    --cpd-color-bg-action-secondary-rest: var(--vg-glass);
+    --cpd-color-bg-action-secondary-hovered: var(--vg-glass-light);
+    --cpd-color-bg-action-secondary-pressed: var(--vg-glass-dark);
+    --cpd-color-bg-action-tertiary-rest: var(--vg-glass);
+    --cpd-color-bg-action-tertiary-hovered: var(--vg-glass-light);
+
+    --cpd-color-bg-accent-rest: var(--vg-accent);
+    --cpd-color-bg-accent-hovered: var(--vg-accent);
+    --cpd-color-bg-accent-pressed: var(--vg-accent);
+
+    --cpd-color-text-primary: var(--vg-text);
+    --cpd-color-text-secondary: var(--vg-text-secondary);
+    --cpd-color-text-disabled: var(--vg-text-muted);
+    --cpd-color-text-action-accent: var(--vg-accent);
+    --cpd-color-text-link-external: var(--vg-accent);
+    --cpd-color-text-on-solid-primary: rgb(0, 0, 0);
+    --cpd-color-text-action-primary: rgb(0, 0, 0);
+
+    --cpd-color-icon-primary: var(--vg-text);
+    --cpd-color-icon-secondary: var(--vg-text-secondary);
+    --cpd-color-icon-accent-primary: var(--vg-accent);
+    --cpd-color-icon-on-solid-primary: rgb(0, 0, 0);
+
+    --cpd-color-border-interactive-primary: rgba(255, 255, 255, 0.18);
+    --cpd-color-border-interactive-secondary: rgba(255, 255, 255, 0.1);
+    --cpd-color-border-interactive-hovered: rgba(255, 255, 255, 0.28);
+}
+
+/* ===== READABILITY ===== */
+.mx_EventTile_body,
+.mx_EventTile .mx_MessageTimestamp,
+.mx_TextualEvent,
+.mx_MemberList h2,
+.mx_BaseCard_title {
+    color: var(--vg-text) !important;
+}
+
+/* ===== COMPOSER ===== */
+.mx_BasicMessageComposer_input {
+    background-color: var(--vg-glass-light) !important;
+    color: var(--vg-text) !important;
+    border-radius: 12px;
+}
+
+/* ===== PRIMARY BUTTONS ===== */
+.mx_AccessibleButton_kind_primary {
+    background-color: var(--vg-accent) !important;
+    border-color: var(--vg-accent) !important;
+    color: rgb(0, 0, 0) !important;
+}

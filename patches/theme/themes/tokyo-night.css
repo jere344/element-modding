@@ -1,0 +1,52 @@
+/**
+ * @name Tokyo Night
+ * @author ported to Element Web
+ * @description A clean dark theme based on the popular Tokyo Night color palette.
+ * @version 1.1
+ */
+
+/* Element stores its palette as base tokens (--cpd-color-gray-*, etc.) on the
+   theme class applied to <body>, and maps semantic tokens (bg-canvas-default,
+   text-primary, ...) onto them. Overriding the base scale here on :root, body
+   (unlayered) wins over the layered theme definitions, so both the semantic
+   tokens and the direct base-token usages pick up the new palette. */
+
+:root, body {
+    /* Neutral scale (100 = darkest, 1400 = lightest) */
+    --cpd-color-theme-bg: #1a1b26;
+    --cpd-color-gray-100: #16161e;
+    --cpd-color-gray-200: #1a1b26;
+    --cpd-color-gray-300: #1f2335;
+    --cpd-color-gray-400: #24283b;
+    --cpd-color-gray-500: #2a2f45;
+    --cpd-color-gray-600: #414868;
+    --cpd-color-gray-700: #565f89;
+    --cpd-color-gray-800: #7a82a8;
+    --cpd-color-gray-900: #a9b1d6;
+    --cpd-color-gray-1000: #b4b9d8;
+    --cpd-color-gray-1100: #bfc5e0;
+    --cpd-color-gray-1200: #c8cfea;
+    --cpd-color-gray-1300: #d5daf2;
+    --cpd-color-gray-1400: #c0caf5;
+
+    /* Accent -> Tokyo Night blue */
+    --cpd-color-bg-accent-rest: #7aa2f7;
+    --cpd-color-bg-accent-hovered: #8fb0ff;
+    --cpd-color-bg-accent-pressed: #668cee;
+    --cpd-color-bg-accent-selected: rgba(122, 162, 247, 0.3);
+    --cpd-color-text-action-accent: #7dcfff;
+    --cpd-color-icon-accent-primary: #7dcfff;
+    --cpd-color-border-accent-primary: #7aa2f7;
+
+    /* Links + info -> Tokyo Night cyan */
+    --cpd-color-blue-900: #7aa2f7;
+    --cpd-color-blue-1100: #7dcfff;
+
+    /* Primary buttons: blue, dark text */
+    --cpd-color-bg-action-primary-rest: #7aa2f7;
+    --cpd-color-bg-action-primary-hovered: #8fb0ff;
+    --cpd-color-bg-action-primary-pressed: #668cee;
+    --cpd-color-text-action-primary: #1a1b26;
+    --cpd-color-text-on-solid-primary: #1a1b26;
+    --cpd-color-icon-on-solid-primary: #1a1b26;
+}

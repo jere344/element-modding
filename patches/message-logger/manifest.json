@@ -1,0 +1,8 @@
+{
+  "id": "message-logger",
+  "name": "Message Logger",
+  "description": "Remembers message text locally and shows deleted messages in red, with a dismiss button that restores the grey 'Message deleted' placeholder.",
+  "version": "1.0.0",
+  "author": "you",
+  "main": "index.js"
+}

@@ -1,0 +1,46 @@
+/**
+ * @name OLED
+ * @author ported to Element Web
+ * @description Pure-black AMOLED theme to save battery on OLED displays.
+ * @version 1.1
+ */
+
+/* Same approach as Tokyo Night: override the base palette on :root, body so it
+   beats Element's layered theme tokens, remapping every surface/text to black. */
+
+:root, body {
+    --cpd-color-theme-bg: #000000;
+    --cpd-color-gray-100: #000000;
+    --cpd-color-gray-200: #000000;
+    --cpd-color-gray-300: #0a0a0a;
+    --cpd-color-gray-400: #111111;
+    --cpd-color-gray-500: #161616;
+    --cpd-color-gray-600: #222222;
+    --cpd-color-gray-700: #333333;
+    --cpd-color-gray-800: #4a4a4a;
+    --cpd-color-gray-900: #b3b3b3;
+    --cpd-color-gray-1000: #c0c0c0;
+    --cpd-color-gray-1100: #cccccc;
+    --cpd-color-gray-1200: #d9d9d9;
+    --cpd-color-gray-1300: #e6e6e6;
+    --cpd-color-gray-1400: #ffffff;
+
+    /* Primary buttons: white on black */
+    --cpd-color-bg-action-primary-rest: #ffffff;
+    --cpd-color-bg-action-primary-hovered: #e0e0e0;
+    --cpd-color-bg-action-primary-pressed: #c0c0c0;
+    --cpd-color-text-action-primary: #000000;
+    --cpd-color-text-on-solid-primary: #000000;
+    --cpd-color-icon-on-solid-primary: #000000;
+
+    /* Accent: brighter green for visibility on black */
+    --cpd-color-bg-accent-rest: #1fc090;
+    --cpd-color-bg-accent-hovered: #2ad1a1;
+    --cpd-color-bg-accent-pressed: #17ac84;
+    --cpd-color-text-action-accent: #1fc090;
+    --cpd-color-icon-accent-primary: #1fc090;
+
+    /* Links/info: light blue on black */
+    --cpd-color-blue-900: #5aa0ff;
+    --cpd-color-blue-1100: #8ab4f8;
+}

@@ -1,0 +1,8 @@
+{
+  "id": "hide-hidden-room",
+  "name": "Hide Room",
+  "description": "Right-click a room and choose 'Hide room' to remove it from the room list. Hidden rooms are saved locally and can be unhidden from a 'Hidden rooms' tab in Settings.",
+  "version": "1.0.0",
+  "author": "you",
+  "main": "index.js"
+}

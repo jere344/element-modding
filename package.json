@@ -1,0 +1,18 @@
+{
+  "name": "element-mods",
+  "version": "0.1.0",
+  "description": "A Vencord-style modding manager for the Element (Matrix) desktop client. Set the Element install path and apply modular patches.",
+  "type": "module",
+  "bin": {
+    "element-mods": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@electron/asar": "^3.2.8"
+  }
+}

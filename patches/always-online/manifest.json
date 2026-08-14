@@ -1,0 +1,8 @@
+{
+  "id": "always-online",
+  "name": "Always Online",
+  "description": "Keeps your account showing as present (green dot) as long as the app is open, instead of dropping to away (orange) or offline (grey).",
+  "version": "1.0.0",
+  "author": "you",
+  "main": "index.js"
+}
