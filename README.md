@@ -72,7 +72,8 @@ The key is stored locally in your browser's localStorage and never leaves your m
 
 Right-click a room and choose 'Hide room' to remove it from the room list. Hidden rooms are saved locally and can be unhidden from a 'Hidden rooms' tab in Settings.
 
-<img width="357" height="426" alt="image" src="https://github.com/user-attachments/assets/ebaa5e13-e8b8-4cac-b66d-701112ee575d" />
+<img width="345" height="331" alt="image" src="https://github.com/user-attachments/assets/9de85ad9-e210-4880-8134-01e5627235b5" />
+
 
 </details>
 
@@ -80,6 +81,7 @@ Right-click a room and choose 'Hide room' to remove it from the room list. Hidde
 <summary><b>Message Logger</b></summary>
 
 Remembers message text locally and shows deleted messages in red, with a dismiss button that restores the grey 'Message deleted' placeholder.
+
 <img width="416" height="156" alt="image" src="https://github.com/user-attachments/assets/50f9e8c0-b44d-4d8c-b691-b9978a3ea781" />
 
 </details>
@@ -123,6 +125,7 @@ Pin/unpin rooms via the room right-click menu and show them as avatar buttons in
 Right-click a message to save it, and open a 'Saved messages' page from a new button in the left sidebar.
 
 <img width="141" height="120" alt="image" src="https://github.com/user-attachments/assets/617e53f3-3f3e-4f2e-9af3-cd8a9a8c5b1f" />
+
 <img width="1004" height="622" alt="image" src="https://github.com/user-attachments/assets/cb4a91b1-5a6b-445a-a579-1bb1977c34ed" />
 
 
