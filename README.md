@@ -43,6 +43,14 @@ sudo node src/cli.js restore      # restore the original webapp
 Click a patch to see its description.
 
 <details>
+<summary><b>Force User Status</b></summary>
+
+Force-enables Element's built-in **MSC4426 User Status** feature (the emoji/text status row in your user menu and the status editor in Settings) even when your homeserver does not advertise support for the `org.matrix.msc4429` unstable feature it requires. Element silently force-disables that feature on servers that don't support it, so the setting alone does nothing — this patch bypasses the server-support check. Restart is recommended after enabling.
+
+Works on any server, including matrix.org and custom servers.
+</details>
+
+<details>
 <summary><b>Status Control</b></summary>
 
 Lets you control your presence from your profile picture in the top-left corner. **Right-click** it to pick a status: **Online**, **Away**, **Offline**, **Busy** or **Automatic** (left-click keeps the normal user menu), and the chosen mode is forced on the server — Element's own idle/away logic can no longer change it. The current status is shown as a presence dot on your avatar.
@@ -62,6 +70,12 @@ To use it you need a (free) Giphy API key:
 5. Paste the key into the field and press Enter.
 
 The key is stored locally in your browser's localStorage and never leaves your machine.
+</details>
+
+<details>
+<summary><b>Hidden Features</b></summary>
+
+Adds a 'Hidden Features' tab to the Settings dialog with toggle switches for Element features that aren't exposed in the normal UI: the MSC4426 user-status system (status rows in your user menu/Settings plus an automatic 📞 on-call status), QR-code login, reaction images, developer mode, timeline debug panels, hidden-event display and more. Changes take effect after restarting the app.
 </details>
 
 <details>

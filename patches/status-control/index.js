@@ -37,14 +37,11 @@ before login and when the client is recreated after login/logout.
     const REASSERT_INTERVAL = 15000;
 
     const SVG_NS = "http://www.w3.org/2000/svg";
-    const BUSY = "org.matrix.msc3026.busy";
-    const BUSY_PRESENCE = ["busy", BUSY];
 
     const MODES = [
         { id: "online", label: "Online", presence: "online" },
         { id: "away", label: "Away", presence: "unavailable" },
         { id: "offline", label: "Offline", presence: "offline" },
-        { id: "busy", label: "Busy", presence: BUSY },
         { id: "auto", label: "Automatic", presence: null },
     ];
     const MODE_BY_ID = Object.fromEntries(MODES.map((m) => [m.id, m]));

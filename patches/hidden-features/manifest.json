@@ -1,0 +1,9 @@
+{
+  "id": "hidden-features",
+  "name": "Hidden Features",
+  "description": "Adds a Settings tab to toggle Element's hidden/experimental features: labs feature flags (MSC4426 user status, QR login, reaction images...), developer mode, timeline debug panels and other settings that are not exposed in the UI.",
+  "version": "1.0.0",
+  "author": "you",
+  "required": true,
+  "main": "index.js"
+}
