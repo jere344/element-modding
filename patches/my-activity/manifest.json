@@ -1,8 +1,0 @@
-{
-  "id": "my-activity",
-  "name": "My Activity",
-  "description": "Shows your own presence dot (online, away, offline or busy) on your profile picture in the top-left corner, matching the indicator shown on other users' avatars.",
-  "version": "1.0.0",
-  "author": "you",
-  "main": "index.js"
-}

@@ -43,9 +43,9 @@ sudo node src/cli.js restore      # restore the original webapp
 Click a patch to see its description.
 
 <details>
-<summary><b>Always Online</b></summary>
+<summary><b>Status Control</b></summary>
 
-Keeps your account showing as present (green dot) as long as the app is open, instead of dropping to away (orange) or offline (grey).
+Lets you control your presence from your profile picture in the top-left corner. **Right-click** it to pick a status: **Online**, **Away**, **Offline**, **Busy** or **Automatic** (left-click keeps the normal user menu), and the chosen mode is forced on the server — Element's own idle/away logic can no longer change it. The current status is shown as a presence dot on your avatar.
 </details>
 
 <details>
@@ -80,12 +80,6 @@ Remembers message text locally and shows deleted messages in red, with a dismiss
 <summary><b>Modding Tab</b></summary>
 
 Adds a 'Modding' tab to the Settings dialog showing the mod platform version and the list of active patches.
-</details>
-
-<details>
-<summary><b>My Activity</b></summary>
-
-Shows your own presence dot (online, away, offline or busy) on your profile picture in the top-left corner, matching the indicator shown on other users' avatars.
 </details>
 
 <details>
