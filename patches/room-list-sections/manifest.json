@@ -1,0 +1,8 @@
+{
+  "id": "room-list-sections",
+  "name": "Room list sections",
+  "description": "Adds a Settings tab to show or hide each room-list section (Unreads, People, Rooms, Mentions, Invites) and adds a new 'Latest' section that lists every conversation (rooms and chats) in chronological order, newest message first.",
+  "version": "1.0.0",
+  "author": "you",
+  "main": "index.js"
+}

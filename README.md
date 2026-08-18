@@ -125,6 +125,13 @@ Pin/unpin rooms via the room right-click menu and show them as avatar buttons in
 </details>
 
 <details>
+<summary><b>Room List Sections</b></summary>
+
+Adds a 'Room list' tab to the Settings dialog to show or hide each section of the conversation list (**Unreads**, **People**, **Rooms**, **Mentions**, **Invites**). It also adds a new **Latest** section that lists every conversation (rooms and chats together) in chronological order, from the most recent message to the oldest.
+
+</details>
+
+<details>
 <summary><b>Save Message</b></summary>
 
 Right-click a message to save it, and open a 'Saved messages' page from a new button in the left sidebar.
