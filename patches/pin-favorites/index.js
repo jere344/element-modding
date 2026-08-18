@@ -40,10 +40,12 @@ when already logged in at load time and when the client appears after login.
 #${SECTION_ID}{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 0 4px;width:100%;box-sizing:border-box;}
 #${SECTION_ID} .element-mods-pin-favorites-divider{width:24px;height:1px;flex:0 0 auto;background:var(--cpd-color-border-disabled,rgba(128,128,128,.35));margin-bottom:2px;}
 #${SECTION_ID} .element-mods-pin-favorites-list{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
-#${SECTION_ID} .element-mods-pin-favorites-room{width:32px;height:32px;padding:0;border:none;border-radius:8px;overflow:hidden;cursor:pointer;flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:var(--cpd-color-bg-subtle-secondary,rgba(128,128,128,.2));}
+#${SECTION_ID} .element-mods-pin-favorites-room{position:relative;width:32px;height:32px;padding:0;border:none;border-radius:8px;overflow:visible;cursor:pointer;flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:var(--cpd-color-bg-subtle-secondary,rgba(128,128,128,.2));}
 #${SECTION_ID} .element-mods-pin-favorites-room:hover{box-shadow:0 0 0 2px var(--cpd-color-bg-action-primary,#0dbd8b);}
-#${SECTION_ID} .element-mods-pin-favorites-room img{width:100%;height:100%;object-fit:cover;display:block;}
+#${SECTION_ID} .element-mods-pin-favorites-room img{width:100%;height:100%;object-fit:cover;display:block;border-radius:8px;}
 #${SECTION_ID} .element-mods-pin-favorites-initial{color:var(--cpd-color-text-primary,inherit);font-weight:600;font-size:14px;line-height:1;}
+#${SECTION_ID} .element-mods-pin-favorites-badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:999px;background:var(--cpd-color-bg-critical,#f3333f);color:#fff;font-size:10px;font-weight:600;line-height:16px;text-align:center;pointer-events:none;border:1px solid var(--cpd-color-bg-canvas-default,#15171e);}
+#${SECTION_ID} .element-mods-pin-favorites-badge.element-mods-pin-favorites-badge--grey{background:var(--cpd-color-bg-subtle-primary,rgba(128,128,128,.6));}
 `;
 
     const PIN_PATH =
@@ -97,6 +99,22 @@ when already logged in at load time and when the client appears after login.
         return null;
     }
 
+    function getUnreadCounts(room) {
+        // Total unread notifications (excludes purely-cosmetic unread message
+        // counts on muted rooms) and the subset that are highlights/mentions.
+        try {
+            const total = room.getUnreadNotificationCount
+                ? room.getUnreadNotificationCount("total") || 0
+                : 0;
+            const highlight = room.getUnreadNotificationCount
+                ? room.getUnreadNotificationCount("highlight") || 0
+                : 0;
+            return { total, highlight };
+        } catch {
+            return { total: 0, highlight: 0 };
+        }
+    }
+
     function describeRoom(c, room) {
         const roomId = room.roomId || "";
         let name = roomId;
@@ -109,7 +127,8 @@ when already logged in at load time and when the client appears after login.
 
         const avatarUrl = getRoomAvatarUrl(c, room);
         const initial = name && name !== roomId ? name.charAt(0).toUpperCase() : "#";
-        return { roomId, name, initial, avatarUrl };
+        const unread = getUnreadCounts(room);
+        return { roomId, name, initial, avatarUrl, unreadTotal: unread.total, unreadHighlight: unread.highlight };
     }
 
     function listRooms(c) {
@@ -212,6 +231,17 @@ when already logged in at load time and when the client appears after login.
             btn.appendChild(span);
         }
 
+        if (room.unreadTotal > 0) {
+            const badge = document.createElement("span");
+            badge.className = "element-mods-pin-favorites-badge";
+            if (room.unreadHighlight === 0) {
+                badge.classList.add("element-mods-pin-favorites-badge--grey");
+            }
+            badge.textContent = room.unreadTotal > 99 ? "99+" : String(room.unreadTotal);
+            badge.setAttribute("aria-hidden", "true");
+            btn.appendChild(badge);
+        }
+
         btn.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -264,7 +294,18 @@ when already logged in at load time and when the client appears after login.
         }
 
         const signature = rooms
-            .map((r) => r.roomId + "\u0001" + r.name + "\u0001" + (r.avatarUrl || ""))
+            .map(
+                (r) =>
+                    r.roomId +
+                    "\u0001" +
+                    r.name +
+                    "\u0001" +
+                    (r.avatarUrl || "") +
+                    "\u0001" +
+                    r.unreadTotal +
+                    "\u0001" +
+                    r.unreadHighlight,
+            )
             .join("\u0002");
 
         // (Re)create the section if it's no longer in the DOM (React removes it
@@ -319,6 +360,7 @@ when already logged in at load time and when the client appears after login.
         try {
             client.on("Room", onChanged);
             client.on("accountData", onChanged);
+            client.on("sync", onChanged);
         } catch (err) {
             console.warn(`[element-mods:${PATCH_ID}] attach failed`, err);
             client = null;
@@ -336,6 +378,11 @@ when already logged in at load time and when the client appears after login.
             }
             try {
                 client.off("accountData", onChanged);
+            } catch {
+                /* ignore */
+            }
+            try {
+                client.off("sync", onChanged);
             } catch {
                 /* ignore */
             }
