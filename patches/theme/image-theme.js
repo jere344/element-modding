@@ -182,6 +182,10 @@
         const accentPress = isLight ? lighten(accent, 0.12) : darken(accent, 0.15);
         const accentLight = isLight ? darken(accent, 0.2) : lighten(accent, 0.3);
         const accentLighter = isLight ? darken(accent, 0.35) : lighten(accent, 0.45);
+        // Mention/reply highlight: Element defaults to a yellowish tint
+        // (--cpd-color-yellow-200 in light, #25271f in dark). Give it a subtle
+        // accent tint instead.
+        const highlightBg = rgba(accent, isLight ? 0.16 : 0.3);
 
         const lines = [
             "/**",
@@ -218,6 +222,20 @@
             `    --cpd-color-text-action-primary: ${hex(onAccent)};`,
             `    --cpd-color-text-on-solid-primary: ${hex(onAccent)};`,
             `    --cpd-color-icon-on-solid-primary: ${hex(onAccent)};`,
+            "}",
+            "",
+            "/* ===== Mention / reply highlight ===== */",
+            ".mx_EventTile[data-layout=\"irc\"].mx_EventTile_highlight .mx_EventTile_line,",
+            ".mx_EventTile[data-layout=\"irc\"].mx_EventTile_highlight .markdown-body .mx_EventTile_line,",
+            ".mx_EventTile[data-layout=\"group\"].mx_EventTile_highlight .mx_EventTile_line,",
+            ".mx_EventTile[data-layout=\"group\"].mx_EventTile_highlight .markdown-body .mx_EventTile_line {",
+            `    background-color: ${highlightBg} !important;`,
+            "}",
+            ".mx_EventTile[data-layout=\"bubble\"].mx_EventTile_highlight::before {",
+            `    background-color: ${highlightBg} !important;`,
+            "}",
+            ".mx_EventTile[data-layout=\"bubble\"].mx_EventTile_highlight .mx_EventTile_avatar {",
+            `    border-color: ${hex(accentHover)} !important;`,
             "}",
         );
 

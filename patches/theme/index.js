@@ -193,6 +193,15 @@ State is persisted in localStorage under "element-mods.themes".
         applyAll();
     }
 
+    function editUserTheme(id, css) {
+        const state = loadState();
+        const theme = state.userThemes.find((t) => t.id === id);
+        if (!theme) return;
+        theme.css = css;
+        saveState(state);
+        applyAll();
+    }
+
     async function addFromUrl(url, name) {
         const res = await fetch(url);
         if (!res.ok) throw new Error("HTTP " + res.status);
@@ -276,10 +285,13 @@ State is persisted in localStorage under "element-mods.themes".
             "background:var(--cpd-color-bg-subtle-secondary,transparent);border-radius:8px;";
 
         const left = el("div");
+        left.style.cssText = "flex:1 1 auto;min-width:0;";
 
         const name = el("span", null, theme.name);
-        name.style.cssText = "font-weight:600;";
+        name.style.cssText =
+            "font-weight:600;display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;";
         const title = el("div");
+        title.style.cssText = "max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
         title.appendChild(name);
 
         if (theme.author) {
@@ -289,10 +301,14 @@ State is persisted in localStorage under "element-mods.themes".
         }
 
         const desc = el("div", null, theme.description || "");
-        desc.style.cssText = "font-size:12px;color:var(--cpd-color-text-secondary,inherit);margin-top:2px;";
+        desc.style.cssText =
+            "font-size:12px;color:var(--cpd-color-text-secondary,inherit);margin-top:2px;" +
+            "max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
 
         const metaLine = el("div", null, `${theme.source === "bundled" ? "Bundled" : "Custom"}${theme.version ? " · v" + theme.version : ""}`);
-        metaLine.style.cssText = "font-size:11px;color:var(--cpd-color-text-secondary,inherit);margin-top:2px;opacity:.8;";
+        metaLine.style.cssText =
+            "font-size:11px;color:var(--cpd-color-text-secondary,inherit);margin-top:2px;opacity:.8;" +
+            "max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
 
         left.appendChild(title);
         left.appendChild(desc);
@@ -300,7 +316,7 @@ State is persisted in localStorage under "element-mods.themes".
         item.appendChild(left);
 
         const controls = el("div");
-        controls.style.cssText = "display:flex;align-items:center;gap:8px;flex:0 0 auto;";
+        controls.style.cssText = "display:flex;align-items:center;gap:4px;flex:0 0 auto;";
 
         controls.appendChild(
             createSwitch(enabled, (checked) => {
@@ -310,14 +326,22 @@ State is persisted in localStorage under "element-mods.themes".
         );
 
         if (theme.source === "user") {
-            const addBtn = (text, borderColor, color, onClick) => {
-                const btn = el("button", null, text);
+            const iconBtn = (svg, title, borderColor, color, onClick) => {
+                const btn = el("button");
                 btn.type = "button";
+                btn.title = title;
                 btn.style.cssText =
-                    `padding:4px 10px;border:1px solid ${borderColor};border-radius:8px;` +
-                    `background:transparent;color:${color};font-size:12px;cursor:pointer;white-space:nowrap;`;
+                    `display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;` +
+                    `border:1px solid ${borderColor};border-radius:6px;background:transparent;color:${color};` +
+                    "cursor:pointer;flex:0 0 auto;";
+                btn.innerHTML = svg;
                 btn.addEventListener("click", onClick);
                 return btn;
+            };
+            const ICON = {
+                rename: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+                edit: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>',
+                remove: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
             };
 
             const startRename = () => {
@@ -360,10 +384,69 @@ State is persisted in localStorage under "element-mods.themes".
                 input.select();
             };
 
-            const renameBtn = addBtn("Rename", "var(--cpd-color-border-interactive-primary,#c0c0c0)", "var(--cpd-color-text-primary,inherit)", startRename);
+            const renameBtn = iconBtn(ICON.rename, "Rename", "var(--cpd-color-border-interactive-primary,#c0c0c0)", "var(--cpd-color-text-primary,inherit)", startRename);
             controls.appendChild(renameBtn);
 
-            const removeBtn = addBtn("Remove", "var(--cpd-color-text-critical-primary,#ff5c5c)", "var(--cpd-color-text-critical-primary,#ff5c5c)", () => {
+            const startEdit = () => {
+                const ta = document.createElement("textarea");
+                ta.value = theme.css;
+                ta.rows = 12;
+                ta.style.cssText =
+                    "width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid " +
+                    "var(--cpd-color-border-interactive-primary,#c0c0c0);border-radius:8px;" +
+                    "background:var(--cpd-color-bg-canvas-default,transparent);" +
+                    "color:var(--cpd-color-text-primary,inherit);font-family:monospace;font-size:12px;resize:vertical;";
+                const commit = () => {
+                    const value = ta.value;
+                    if (value && value !== theme.css) {
+                        editUserTheme(theme.id, value);
+                    }
+                    refreshPanel();
+                };
+                const cancel = () => refreshPanel();
+                ta.addEventListener("keydown", (e) => {
+                    if (e.key === "Escape") cancel();
+                    else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) commit();
+                });
+
+                const saveBtn = el("button", null, "Save");
+                saveBtn.type = "button";
+                saveBtn.style.cssText =
+                    "padding:4px 10px;border:none;border-radius:6px;background:var(--cpd-color-bg-action-primary,#0dbd8b);" +
+                    "color:#fff;font-size:12px;cursor:pointer;white-space:nowrap;";
+                saveBtn.addEventListener("click", commit);
+
+                const cancelBtn = el("button", null, "Cancel");
+                cancelBtn.type = "button";
+                cancelBtn.style.cssText =
+                    "padding:4px 10px;border:1px solid var(--cpd-color-border-interactive-primary,#c0c0c0);border-radius:6px;" +
+                    "background:transparent;color:var(--cpd-color-text-primary,inherit);font-size:12px;cursor:pointer;white-space:nowrap;";
+                cancelBtn.addEventListener("click", cancel);
+
+                const label = el("div", null, `Editing ${theme.name}`);
+                label.style.cssText = "font-weight:600;margin-bottom:6px;";
+
+                const hint = el("div", null, "Ctrl+Enter to save, Esc to cancel. Edits the raw CSS of this theme.");
+                hint.style.cssText = "font-size:11px;color:var(--cpd-color-text-secondary,inherit);margin:4px 0 8px;";
+
+                const btnRow = el("div");
+                btnRow.style.cssText = "display:flex;align-items:center;gap:8px;margin-top:8px;";
+                btnRow.appendChild(saveBtn);
+                btnRow.appendChild(cancelBtn);
+
+                item.textContent = "";
+                item.appendChild(label);
+                item.appendChild(ta);
+                item.appendChild(hint);
+                item.appendChild(btnRow);
+                ta.focus();
+                ta.select();
+            };
+
+            const editBtn = iconBtn(ICON.edit, "Edit CSS", "var(--cpd-color-border-interactive-primary,#c0c0c0)", "var(--cpd-color-text-primary,inherit)", startEdit);
+            controls.appendChild(editBtn);
+
+            const removeBtn = iconBtn(ICON.remove, "Remove", "var(--cpd-color-text-critical-primary,#ff5c5c)", "var(--cpd-color-text-critical-primary,#ff5c5c)", () => {
                 removeUserTheme(theme.id);
                 refreshPanel();
             });
