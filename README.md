@@ -139,7 +139,7 @@ Right-click a message to save it, and open a 'Saved messages' page from a new bu
 <details>
 <summary><b>Themes</b></summary>
 
-Theme engine modeled after Vencord's theme system: apply and manage custom CSS themes (bundled, added by URL, or pasted)
+Theme engine modeled after Vencord's theme system: apply and manage custom CSS themes (bundled, added by URL, pasted, or **generated from an uploaded image** — a color palette is extracted from the image and turned into a theme automatically.
 
 <img width="1055" height="866" alt="image" src="https://github.com/user-attachments/assets/0356add0-7b28-47b9-893f-7d7f4e9359d9" />
 

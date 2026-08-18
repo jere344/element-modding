@@ -13,7 +13,12 @@ This patch recreates that flow for Element Web:
     available immediately. Their CSS lives in patches/theme/themes/*.css and is
     fetched at runtime from mods/patches/theme/themes/.
   - It adds a "Themes" tab to the Settings dialog where you can toggle themes,
-    install one from a URL, or paste raw CSS.
+    install one from a URL, paste raw CSS, or upload an image to build a theme
+    from its color palette automatically (a browser-native reimplementation of
+    the pywal/element-wal idea: the image is quantized on a canvas and the
+    extracted colors are mapped onto Element's --cpd-color-* tokens). The
+    uploaded image can optionally also be used as a glassmorphism background
+    or as a blurred backdrop behind the conversation (two checkboxes).
   - Enabled themes are injected as <style data-theme-id="..."> elements so they
     can be removed again without reloading.
 
@@ -166,9 +171,24 @@ State is persisted in localStorage under "element-mods.themes".
     }
 
     function removeUserTheme(id) {
+        removeThemeStyle(id);
         const state = loadState();
         state.userThemes = state.userThemes.filter((t) => t.id !== id);
         state.enabled = state.enabled.filter((e) => e !== id);
+        saveState(state);
+        applyAll();
+    }
+
+    function renameUserTheme(id, name) {
+        const state = loadState();
+        const theme = state.userThemes.find((t) => t.id === id);
+        if (!theme) return;
+        theme.name = name;
+        // Keep an @name header (if the CSS carries one) in sync so the new name
+        // survives re-normalization via parseMeta.
+        if (/@name\s+/i.test(theme.css)) {
+            theme.css = theme.css.replace(/(@name\s+)([^\n*]+?)\s*(?=\*)/i, "$1" + name + " ");
+        }
         saveState(state);
         applyAll();
     }
@@ -178,6 +198,28 @@ State is persisted in localStorage under "element-mods.themes".
         if (!res.ok) throw new Error("HTTP " + res.status);
         const css = await res.text();
         return addUserTheme(css, name);
+    }
+
+    // ------------------------------------------------------------------
+    // Image -> palette -> theme generation lives in image-theme.js (loaded
+    // on demand); this loader fetches it the same way the loader.js injects
+    // patches, so it works under the app's script restrictions.
+    // ------------------------------------------------------------------
+    let imageThemePromise = null;
+    function loadImageTheme() {
+        if (!imageThemePromise) {
+            imageThemePromise = new Promise((resolve, reject) => {
+                const script = document.createElement("script");
+                script.src = "mods/patches/theme/image-theme.js";
+                script.onload = () => resolve(window.elementModsImageTheme);
+                script.onerror = () => {
+                    imageThemePromise = null;
+                    reject(new Error("Image helper failed to load"));
+                };
+                document.head.appendChild(script);
+            });
+        }
+        return imageThemePromise;
     }
 
     // ------------------------------------------------------------------
@@ -268,13 +310,60 @@ State is persisted in localStorage under "element-mods.themes".
         );
 
         if (theme.source === "user") {
-            const removeBtn = el("button", null, "Remove");
-            removeBtn.type = "button";
-            removeBtn.style.cssText =
-                "padding:4px 10px;border:1px solid var(--cpd-color-text-critical-primary,#ff5c5c);" +
-                "border-radius:8px;background:transparent;color:var(--cpd-color-text-critical-primary,#ff5c5c);" +
-                "font-size:12px;cursor:pointer;";
-            removeBtn.addEventListener("click", () => {
+            const addBtn = (text, borderColor, color, onClick) => {
+                const btn = el("button", null, text);
+                btn.type = "button";
+                btn.style.cssText =
+                    `padding:4px 10px;border:1px solid ${borderColor};border-radius:8px;` +
+                    `background:transparent;color:${color};font-size:12px;cursor:pointer;white-space:nowrap;`;
+                btn.addEventListener("click", onClick);
+                return btn;
+            };
+
+            const startRename = () => {
+                const input = document.createElement("input");
+                input.type = "text";
+                input.value = theme.name;
+                input.style.cssText =
+                    "width:100%;box-sizing:border-box;padding:4px 8px;border:1px solid " +
+                    "var(--cpd-color-border-interactive-primary,#c0c0c0);border-radius:6px;" +
+                    "background:var(--cpd-color-bg-canvas-default,transparent);" +
+                    "color:var(--cpd-color-text-primary,inherit);font:inherit;font-weight:600;";
+                const commit = () => {
+                    const value = input.value.trim();
+                    if (value && value !== theme.name) {
+                        renameUserTheme(theme.id, value);
+                        refreshPanel();
+                    } else {
+                        refreshPanel();
+                    }
+                };
+                const cancel = () => refreshPanel();
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") commit();
+                    else if (e.key === "Escape") cancel();
+                });
+                const saveBtn = el("button", null, "Save");
+                saveBtn.type = "button";
+                saveBtn.style.cssText =
+                    "padding:4px 10px;border:none;border-radius:6px;background:var(--cpd-color-bg-action-primary,#0dbd8b);" +
+                    "color:#fff;font-size:12px;cursor:pointer;white-space:nowrap;margin-left:8px;";
+                saveBtn.addEventListener("click", commit);
+
+                title.textContent = "";
+                const row = el("div");
+                row.style.cssText = "display:flex;align-items:center;gap:0;";
+                row.appendChild(input);
+                row.appendChild(saveBtn);
+                title.appendChild(row);
+                input.focus();
+                input.select();
+            };
+
+            const renameBtn = addBtn("Rename", "var(--cpd-color-border-interactive-primary,#c0c0c0)", "var(--cpd-color-text-primary,inherit)", startRename);
+            controls.appendChild(renameBtn);
+
+            const removeBtn = addBtn("Remove", "var(--cpd-color-text-critical-primary,#ff5c5c)", "var(--cpd-color-text-critical-primary,#ff5c5c)", () => {
                 removeUserTheme(theme.id);
                 refreshPanel();
             });
@@ -326,6 +415,7 @@ State is persisted in localStorage under "element-mods.themes".
         content.appendChild(addTitle);
 
         const status = el("div");
+        status.setAttribute("data-theme-status", "true");
         status.style.cssText = "font-size:12px;color:var(--cpd-color-text-critical-primary,#ff5c5c);margin-bottom:8px;min-height:16px;";
         content.appendChild(status);
 
@@ -402,6 +492,90 @@ State is persisted in localStorage under "element-mods.themes".
             refreshPanel();
         });
         content.appendChild(pasteBtn);
+
+        // Create-from-image form.
+        const imageDivider = el("hr");
+        imageDivider.style.cssText = "border:none;border-top:1px solid var(--cpd-color-border-disabled,#e0e0e0);margin:20px 0 16px;";
+        content.appendChild(imageDivider);
+
+        const imageTitle = el("div", null, "Or create one from an image");
+        imageTitle.style.cssText = "font:var(--cpd-font-heading-sm-semibold,600 14px/1.4 sans-serif);margin-bottom:8px;";
+        content.appendChild(imageTitle);
+
+        const imageHint = el("div", null, "Pick an image and a color palette is extracted from it to build a theme automatically. Optionally use the image as a glassy background and/or as a blurred backdrop behind the conversation.");
+        imageHint.style.cssText = "color:var(--cpd-color-text-secondary,inherit);margin-bottom:10px;";
+        content.appendChild(imageHint);
+
+        const imageRow = el("div");
+        imageRow.style.cssText = "display:flex;align-items:center;gap:10px;margin-bottom:12px;";
+
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/*";
+        fileInput.style.display = "none";
+
+        const chooseBtn = el("button", null, "Choose image…");
+        chooseBtn.type = "button";
+        chooseBtn.style.cssText =
+            "padding:8px 16px;border:none;border-radius:8px;background:var(--cpd-color-bg-action-primary,#0dbd8b);" +
+            "color:#fff;cursor:pointer;white-space:nowrap;";
+        chooseBtn.addEventListener("click", () => fileInput.click());
+
+        const preview = document.createElement("img");
+        preview.alt = "";
+        preview.style.cssText =
+            "width:44px;height:44px;object-fit:cover;border-radius:8px;" +
+            "border:1px solid var(--cpd-color-border-interactive-primary,#c0c0c0);display:none;";
+
+        const bgLabel = document.createElement("label");
+        bgLabel.style.cssText =
+            "display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:12px;" +
+            "color:var(--cpd-color-text-secondary,inherit);cursor:pointer;";
+        const bgCheckbox = document.createElement("input");
+        bgCheckbox.type = "checkbox";
+        bgCheckbox.style.cssText = "margin:0;cursor:pointer;";
+        bgLabel.appendChild(bgCheckbox);
+        bgLabel.appendChild(el("span", null, "Use image as a glassy background (glassmorphism)"));
+        content.appendChild(bgLabel);
+
+        const blurLabel = document.createElement("label");
+        blurLabel.style.cssText =
+            "display:flex;align-items:center;gap:6px;margin-bottom:12px;font-size:12px;" +
+            "color:var(--cpd-color-text-secondary,inherit);cursor:pointer;";
+        const blurCheckbox = document.createElement("input");
+        blurCheckbox.type = "checkbox";
+        blurCheckbox.style.cssText = "margin:0;cursor:pointer;";
+        blurLabel.appendChild(blurCheckbox);
+        blurLabel.appendChild(el("span", null, "Use image as blurred conversation background"));
+        content.appendChild(blurLabel);
+
+        fileInput.addEventListener("change", async () => {
+            const file = fileInput.files && fileInput.files[0];
+            if (!file) return;
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = "block";
+            chooseBtn.disabled = true;
+            status.textContent = "Extracting palette…";
+            try {
+                const opts = { asBackground: bgCheckbox.checked, asBlur: blurCheckbox.checked };
+                const imageTheme = await loadImageTheme();
+                await imageTheme.createThemeFromImage(file, opts, addUserTheme);
+                status.textContent = "";
+                refreshPanel();
+                const st = document.querySelector("[data-theme-panel] [data-theme-status]");
+                if (st) st.textContent = "Theme created.";
+            } catch (err) {
+                status.textContent = "Failed to create theme: " + (err && err.message ? err.message : err);
+                preview.style.display = "none";
+            } finally {
+                chooseBtn.disabled = false;
+            }
+        });
+
+        imageRow.appendChild(fileInput);
+        imageRow.appendChild(chooseBtn);
+        imageRow.appendChild(preview);
+        content.appendChild(imageRow);
 
         return content;
     }
