@@ -59,20 +59,19 @@ Lets you control your presence from your profile picture in the top-left corner.
 <details>
 <summary><b>GIF Picker</b></summary>
 
-Adds a Giphy GIF picker button to the message composer to search GIFs and send them into the current room.
+Adds a GIF picker button to the message composer to search GIFs from **Giphy** or **Klipy** (switchable via a dropdown in the picker header; your last choice is remembered) and send them into the current room.
 
 <img width="1245" height="634" alt="image" src="https://github.com/user-attachments/assets/8716252f-2ef7-4479-afa6-c0abcd60f217" />
 
 
-To use it you need a (free) Giphy API key:
+To use it you need a (free) API key for each provider:
 
-1. Go to https://developers.giphy.com and sign in.
-2. Click **Create an App** and fill out the short form (the beta key is fine for personal use).
-3. Copy the API key.
-4. In Element, open the GIF picker and click the **gear** (⚙) icon in its header.
-5. Paste the key into the field and press Enter.
+1. **Giphy**: go to https://developers.giphy.com, sign in, click **Create an App** and copy the API key.
+2. **Klipy**: go to https://partner.klipy.com/api-keys, create a platform, click **Create Key** and copy it.
+3. In Element, open the GIF picker, pick the provider in the dropdown, and click the **gear** (⚙) icon in its header.
+4. Paste the key into the field and press Enter.
 
-The key is stored locally in your browser's localStorage and never leaves your machine.
+Keys are stored locally in your browser's localStorage and never leave your machine.
 </details>
 
 <details>

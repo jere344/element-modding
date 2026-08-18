@@ -1,26 +1,136 @@
 /*
-Patch: GIF picker (Giphy source).
+Patch: GIF picker (Giphy & Klipy sources).
 
 Adds a "GIF" button to the message composer (next to the emoji button). Clicking
-it opens a popover that searches Giphy (https://api.giphy.com) and shows a grid
-of animated thumbnails. Clicking a result uploads the GIF to the homeserver and
+it opens a popover that searches for GIFs and shows a grid of animated
+thumbnails. Giphy and Klipy are both supported, switchable from a dropdown in
+the picker header. Clicking a result uploads the GIF to the homeserver and
 sends it as an m.image message into the currently open room.
 
 Sending relies on Element's page-world globals:
   - window.mxMatrixClientPeg.safeGet() -> the matrix-js-sdk MatrixClient
   - window.location.hash              -> "#/room/<roomId>" for the current room
 
-You need a free Giphy API key (developers.giphy.com -> Create an App -> beta
-key). Paste it via the gear icon in the picker. The key is stored in
-localStorage under "element-mods.giphy.key".
+You need an API key for each provider (Giphy: developers.giphy.com; Klipy:
+partner.klipy.com -> api-keys). Paste each key via the gear icon in the picker.
+Keys are stored in localStorage under "element-mods.{giphy,klipy}.key".
 */
 (() => {
     "use strict";
 
     const PATCH_ID = "gif-picker";
-    const API_BASE = "https://api.giphy.com/v1/gifs/search";
-    const API_KEY_STORAGE = "element-mods.giphy.key";
     const FAVORITES_STORAGE = "element-mods.gifpicker.favorites";
+    const PROVIDER_STORAGE = "element-mods.gifpicker.provider";
+
+    function normSize(v) {
+        const n = parseInt(v, 10);
+        return Number.isFinite(n) ? n : undefined;
+    }
+
+    function dims(list) {
+        return list && list.length >= 2 ? [normSize(list[0]), normSize(list[1])] : [undefined, undefined];
+    }
+
+    function pick(obj, names) {
+        for (const name of names) {
+            if (obj && obj[name] && obj[name].url) return obj[name];
+        }
+        return null;
+    }
+
+    const MIME_BY_EXT = {
+        gif: "image/gif",
+        webp: "image/webp",
+        jpg: "image/jpeg",
+        jpeg: "image/jpeg",
+        png: "image/png",
+    };
+
+    function mimeFromUrl(url) {
+        const ext = String(url || "").split("?")[0].split(".").pop().toLowerCase();
+        return MIME_BY_EXT[ext] || "application/octet-stream";
+    }
+
+    function loadPref(key, isValid, fallback) {
+        try {
+            const v = localStorage.getItem(key);
+            return isValid(v) ? v : fallback;
+        } catch {
+            return fallback;
+        }
+    }
+
+    function savePref(key, value) {
+        try {
+            localStorage.setItem(key, value);
+        } catch {
+            /* ignore */
+        }
+    }
+
+    function makeResult(r, thumb, full) {
+        if (!r || !thumb || !full || !thumb.url || !full.url) return null;
+        return {
+            id: r.id,
+            title: r.title || "GIF",
+            thumb: { url: thumb.url, width: thumb.width, height: thumb.height },
+            full: { url: full.url, width: full.width, height: full.height, mimetype: mimeFromUrl(full.url) },
+        };
+    }
+
+    // ---- Giphy ---------------------------------------------------
+
+    function normalizeGiphy(r) {
+        const imgs = r.images || {};
+        const full = imgs.original || imgs.downsized || imgs.fixed_width;
+        const t = pick(imgs, ["preview_gif", "fixed_width", "downsized", "fixed_height"]);
+        if (!full || !t) return null;
+        return makeResult(r,
+            { url: t.url, width: normSize(t.width), height: normSize(t.height) },
+            { url: full.url, width: normSize(full.width), height: normSize(full.height) });
+    }
+
+    // ---- Klipy ---------------------------------------------------
+
+    function normalizeKlipy(r) {
+        const mf = (r && r.media_formats) || {};
+        const full = pick(mf, ["gif", "mediumgif"]);
+        const t = pick(mf, ["tinygif", "tinygifpreview", "mediumgif", "gif"]);
+        if (!full || !t) return null;
+        return makeResult(r,
+            { url: t.url, width: dims(t.dims)[0], height: dims(t.dims)[1] },
+            { url: full.url, width: dims(full.dims)[0], height: dims(full.dims)[1] });
+    }
+
+    const PROVIDERS = {
+        giphy: {
+            name: "Giphy",
+            keyStorage: "element-mods.giphy.key",
+            keyName: "Giphy API key",
+            async search(q, limit) {
+                const key = getKey(this.keyStorage);
+                const url = `https://api.giphy.com/v1/gifs/search?api_key=${encodeURIComponent(key)}&q=${encodeURIComponent(q)}&limit=${limit}&rating=g&lang=en`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Giphy HTTP ${res.status}`);
+                const data = await res.json();
+                return (data.data || []).map(normalizeGiphy).filter(Boolean);
+            },
+        },
+        klipy: {
+            name: "Klipy",
+            keyStorage: "element-mods.klipy.key",
+            keyName: "Klipy API key",
+            async search(q, limit) {
+                const key = getKey(this.keyStorage);
+                const formats = "tinygif,gif,tinygifpreview,preview";
+                const url = `https://api.klipy.com/v2/search?key=${encodeURIComponent(key)}&q=${encodeURIComponent(q)}&limit=${limit}&contentfilter=high&media_filter=${formats}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Klipy HTTP ${res.status}`);
+                const data = await res.json();
+                return (data.results || []).map(normalizeKlipy).filter(Boolean);
+            },
+        },
+    };
 
     const COMPOSER_SELECTOR = ".mx_MessageComposer_actions";
     const EMOJI_SELECTOR = ".mx_EmojiButton";
@@ -32,6 +142,8 @@ localStorage under "element-mods.giphy.key".
     let statusEl = null;
     let keyRow = null;
     let composerButton = null;
+    let providerSelect = null;
+    let provider = loadPref(PROVIDER_STORAGE, (v) => Object.prototype.hasOwnProperty.call(PROVIDERS, v), "giphy");
     let observer = null;
     let open = false;
     let sending = false;
@@ -43,21 +155,29 @@ localStorage under "element-mods.giphy.key".
         return node;
     }
 
-    function getApiKey() {
+    function getKey(name) {
         try {
-            return localStorage.getItem(API_KEY_STORAGE);
+            return localStorage.getItem(name);
         } catch {
             return null;
         }
     }
 
-    function setApiKey(key) {
+    function setKey(name, key) {
         try {
-            if (key) localStorage.setItem(API_KEY_STORAGE, key);
-            else localStorage.removeItem(API_KEY_STORAGE);
+            if (key) localStorage.setItem(name, key);
+            else localStorage.removeItem(name);
         } catch {
             /* ignore */
         }
+    }
+
+    function getApiKey() {
+        return getKey(PROVIDERS[provider].keyStorage);
+    }
+
+    function setApiKey(key) {
+        setKey(PROVIDERS[provider].keyStorage, key);
     }
 
     function getFavorites() {
@@ -126,6 +246,9 @@ localStorage under "element-mods.giphy.key".
 .element-mods-gifpicker-composer-button:hover{color:var(--cpd-color-icon-primary,inherit);}
 .emo-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #2f2f38;}
 .emo-title{font-weight:700;font-size:15px;}
+.emo-heading{display:flex;align-items:center;gap:8px;}
+.emo-provider{background:#16161b;color:#e5e7eb;border:1px solid #2f2f38;border-radius:6px;font-size:12px;padding:2px 6px;outline:none;}
+.emo-provider:hover{border-color:#2563eb;}
 .emo-gear{background:none;border:none;color:#9ca3af;cursor:pointer;font-size:16px;}
 .emo-gear:hover{color:#fff;}
 .emo-keyrow{display:none;padding:8px 12px;border-bottom:1px solid #2f2f38;background:#16161b;}
@@ -152,15 +275,15 @@ localStorage under "element-mods.giphy.key".
         document.head.appendChild(style);
     }
 
-    function thumbInfo(images) {
-        if (!images) return null;
-        const cand = images.preview_gif || images.fixed_width || images.downsized;
-        if (!cand || !cand.url) return null;
-        return {
-            url: cand.url,
-            width: parseInt(cand.width, 10) || undefined,
-            height: parseInt(cand.height, 10) || undefined,
-        };
+    function onProviderChange(p) {
+        provider = p;
+        savePref(PROVIDER_STORAGE, p);
+        if (keyInput) {
+            keyInput.placeholder = PROVIDERS[p].keyName;
+            keyInput.value = getKey(PROVIDERS[p].keyStorage) || "";
+        }
+        if (searchInput.value.trim()) search(searchInput.value);
+        else showFavorites();
     }
 
     const COLUMNS = 2;
@@ -178,8 +301,8 @@ localStorage under "element-mods.giphy.key".
         const heights = new Array(COLUMNS).fill(0);
 
         for (const r of results) {
-            const info = thumbInfo(r.images);
-            if (!info) continue;
+            const info = r.thumb;
+            if (!info || !info.url) continue;
             const wrap = el("div", "emo-result");
             const btn = el("button", "emo-result-send");
             btn.type = "button";
@@ -190,7 +313,7 @@ localStorage under "element-mods.giphy.key".
             if (info.width) img.width = info.width;
             if (info.height) img.height = info.height;
             btn.appendChild(img);
-            btn.addEventListener("click", () => sendGif(r));
+            btn.addEventListener("click", () => sendResult(r));
             wrap.appendChild(btn);
 
             const fav = isFavorite(r);
@@ -238,20 +361,18 @@ localStorage under "element-mods.giphy.key".
             showFavorites();
             return;
         }
+        const prov = PROVIDERS[provider];
         const key = getApiKey();
         if (!key) {
-            setStatus("Set a Giphy API key (gear icon) first.", true);
+            setStatus(`Set a ${prov.name} API key (gear icon) first.`, true);
             keyRow.classList.add("emo-open");
             if (keyInput) keyInput.focus();
             return;
         }
         setStatus("Searching…");
         try {
-            const url = `${API_BASE}?api_key=${encodeURIComponent(key)}&q=${encodeURIComponent(query)}&limit=20&rating=g&lang=en`;
-            const res = await fetch(url);
-            if (!res.ok) throw new Error(`Giphy HTTP ${res.status}`);
-            const data = await res.json();
-            renderResults(data.data || []);
+            const results = await prov.search(query, 20);
+            renderResults(results || []);
             setStatus("");
         } catch (err) {
             console.error("[element-mods:gif-picker] search failed", err);
@@ -259,7 +380,7 @@ localStorage under "element-mods.giphy.key".
         }
     }
 
-    async function sendGif(result) {
+    async function sendResult(result) {
         if (sending) return;
         const client = getClient();
         if (!client) {
@@ -271,8 +392,8 @@ localStorage under "element-mods.giphy.key".
             setStatus("Open a room first.", true);
             return;
         }
-        const gif = result.images && result.images.original;
-        if (!gif || !gif.url) {
+        const full = result.full;
+        if (!full || !full.url) {
             setStatus("No GIF media URL.", true);
             return;
         }
@@ -280,20 +401,21 @@ localStorage under "element-mods.giphy.key".
         sending = true;
         setStatus("Sending…");
         try {
-            const resp = await fetch(gif.url);
+            const resp = await fetch(full.url);
             if (!resp.ok) throw new Error(`fetch ${resp.status}`);
             const blob = await resp.blob();
-            const file = new File([blob], `giphy-${result.id}.gif`, { type: "image/gif" });
+            const ext = full.mimetype === "image/gif" ? "gif" : "bin";
+            const file = new File([blob], `${provider}-${result.id}.${ext}`, { type: full.mimetype });
 
             const upload = await client.uploadContent(file);
             const mxc = upload && (upload.content_uri || upload.url);
             if (!mxc) throw new Error("no content_uri from upload");
 
             const info = {
-                mimetype: "image/gif",
+                mimetype: full.mimetype,
                 size: file.size,
-                w: gif.width ? parseInt(gif.width, 10) : undefined,
-                h: gif.height ? parseInt(gif.height, 10) : undefined,
+                w: full.width,
+                h: full.height,
             };
             await client.sendImageMessage(roomId, null, mxc, info, result.title || "GIF");
             setStatus("Sent ✓");
@@ -379,7 +501,16 @@ localStorage under "element-mods.giphy.key".
 
         // Header
         const header = el("div", "emo-header");
-        header.appendChild(el("span", "emo-title", "Giphy"));
+        const heading = el("div", "emo-heading");
+        heading.appendChild(el("span", "emo-title", "GIF picker"));
+        providerSelect = el("select", "emo-provider");
+        for (const id of Object.keys(PROVIDERS)) {
+            providerSelect.appendChild(new Option(PROVIDERS[id].name, id));
+        }
+        providerSelect.value = provider;
+        providerSelect.addEventListener("change", () => onProviderChange(providerSelect.value));
+        heading.appendChild(providerSelect);
+        header.appendChild(heading);
         const gear = el("button", "emo-gear", "⚙");
         gear.type = "button";
         gear.title = "API key";
@@ -391,9 +522,12 @@ localStorage under "element-mods.giphy.key".
         keyRow = el("div", "emo-keyrow");
         keyInput = el("input", "emo-input");
         keyInput.type = "password";
-        keyInput.placeholder = "Giphy API key";
+        keyInput.placeholder = PROVIDERS[provider].keyName;
         keyInput.value = getApiKey();
-        keyInput.addEventListener("change", () => setApiKey(keyInput.value.trim()));
+        keyInput.addEventListener("change", () => {
+            setApiKey(keyInput.value.trim());
+            if (searchInput.value.trim()) search(searchInput.value.trim());
+        });
         keyRow.appendChild(keyInput);
         p.appendChild(keyRow);
 
@@ -450,7 +584,7 @@ localStorage under "element-mods.giphy.key".
         if (composerButton) composerButton.remove();
         if (picker) picker.remove();
         composerButton = null;
-        picker = grid = searchInput = keyInput = statusEl = keyRow = null;
+        picker = grid = searchInput = keyInput = statusEl = keyRow = providerSelect = null;
         open = false;
         const style = document.getElementById("element-mods-gifpicker-style");
         if (style) style.remove();

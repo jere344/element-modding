@@ -1,8 +1,8 @@
 {
   "id": "gif-picker",
   "name": "GIF Picker",
-  "description": "Adds a Giphy GIF picker button to the message composer to search GIFs and send them into the current room.",
-  "version": "1.0.0",
+  "description": "Adds a GIF picker button to the message composer to search GIFs from Giphy or Klipy and send them into the current room.",
+  "version": "1.3.0",
   "author": "you",
   "main": "index.js"
 }
