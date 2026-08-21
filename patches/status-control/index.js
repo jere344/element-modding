@@ -561,10 +561,10 @@ before login and when the client is recreated after login/logout.
 .element-mods-status-label {
     flex: 1;
 }
-.mx_PresenceIconView_online { color: #4cc38a; }
-.mx_PresenceIconView_unavailable { color: #fbca52; }
-.mx_PresenceIconView_offline { color: #9f9f9f; }
-.mx_PresenceIconView_dnd { color: #f4675a; }
+.mx_PresenceIconView_online { color: var(--cpd-color-icon-accent-primary, #4cc38a); }
+.mx_PresenceIconView_unavailable { color: var(--cpd-color-icon-warning-primary, #fbca52); }
+.mx_PresenceIconView_offline { color: var(--cpd-color-icon-tertiary, #9f9f9f); }
+.mx_PresenceIconView_dnd { color: var(--cpd-color-icon-critical-primary, #f4675a); }
 .element-mods-status-control.element-mods-status-dot {
     position: absolute;
     right: 2px;

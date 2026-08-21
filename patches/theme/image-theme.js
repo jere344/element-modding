@@ -182,6 +182,13 @@
         const accentPress = isLight ? lighten(accent, 0.12) : darken(accent, 0.15);
         const accentLight = isLight ? darken(accent, 0.2) : lighten(accent, 0.3);
         const accentLighter = isLight ? darken(accent, 0.35) : lighten(accent, 0.45);
+        // Selected ("self-added") reaction pills are styled from the green
+        // scale (Element hard-codes them to a stock green), not the accent
+        // scale. Remap them to the extracted accent so your own reactions get
+        // the themed colour too, matching the grey-scale pills of others.
+        const reactSelected = isLight ? darken(accent, 0.22) : lighten(accent, 0.25);
+        const reactSelectedHover = isLight ? darken(accent, 0.18) : lighten(accent, 0.3);
+        const reactSelectedPress = isLight ? darken(accent, 0.28) : lighten(accent, 0.2);
         // Mention/reply highlight: Element defaults to a yellowish tint
         // (--cpd-color-yellow-200 in light, #25271f in dark). Give it a subtle
         // accent tint instead.
@@ -210,6 +217,17 @@
             `    --cpd-color-text-action-accent: ${hex(accentLight)};`,
             `    --cpd-color-icon-accent-primary: ${hex(accentLight)};`,
             `    --cpd-color-border-accent-primary: ${hex(accent)};`,
+            "",
+            "    /* Selected (self-added) reaction pills: Element uses the green scale */",
+            `    --cpd-color-green-100: ${rgba(accent, 0.35)};`,
+            `    --cpd-color-green-200: ${rgba(accent, 0.55)};`,
+            `    --cpd-color-green-300: ${hex(reactSelected)};`,
+            `    --cpd-color-green-400: ${hex(reactSelectedHover)};`,
+            `    --cpd-color-green-500: ${hex(accent)};`,
+            `    --cpd-color-green-600: ${hex(accent)};`,
+            `    --cpd-color-green-700: ${hex(reactSelectedPress)};`,
+            `    --cpd-color-green-800: ${hex(accent)};`,
+            `    --cpd-color-green-900: ${hex(reactSelectedPress)};`,
             "",
             "    /* Links + info */",
             `    --cpd-color-blue-900: ${hex(accent)};`,
