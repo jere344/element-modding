@@ -91,6 +91,14 @@ Right-click a room and choose 'Hide room' to remove it from the room list. Hidde
 </details>
 
 <details>
+<summary><b>Message Subscriptions</b></summary>
+
+Creates **local-only subscription channels**: a channel that gathers every message containing a word you pick from a channel you pick, visible only to you (everything is stored locally, nothing is sent to any server). Configure subscriptions in **Settings -> Subscriptions** by choosing a source channel and typing a word. Each subscription appears as a button in the left sidebar, below the pinned rooms; clicking it opens a live view (newest first) of every matching message, with a button to jump to each one in its real room. It updates in real time as new matching messages arrive.
+
+For example: choose the channel **Escalade Support-DEV** and the word **notidoc** — every message in that channel containing "notidoc" will appear in your new subscription channel.
+</details>
+
+<details>
 <summary><b>Message Logger</b></summary>
 
 Remembers message text locally and shows deleted messages in red, with a dismiss button that restores the grey 'Message deleted' placeholder.
