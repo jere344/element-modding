@@ -3,6 +3,6 @@
   "name": "GIF Picker",
   "description": "Adds a GIF picker button to the message composer to search GIFs from Giphy or Klipy and send them into the current room.",
   "version": "1.3.0",
-  "author": "you",
+  "author": "jere344",
   "main": "index.js"
 }

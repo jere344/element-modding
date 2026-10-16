@@ -1,13 +1,41 @@
 {
   "name": "element-mods",
   "version": "0.1.0",
-  "description": "A Vencord-style modding manager for the Element (Matrix) desktop client. Set the Element install path and apply modular patches.",
+  "description": "A Vencord-style mod manager for the Element (Matrix) desktop client: apply modular patches to your install.",
   "type": "module",
+  "license": "MIT",
+  "author": "jere344",
+  "homepage": "https://github.com/jere344/element-modding#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jere344/element-modding.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jere344/element-modding/issues"
+  },
+  "keywords": [
+    "element",
+    "matrix",
+    "element-desktop",
+    "mods",
+    "plugins",
+    "patches",
+    "themes",
+    "vencord",
+    "cli"
+  ],
   "bin": {
     "element-mods": "src/cli.js"
   },
+  "files": [
+    "src",
+    "patches",
+    "assets",
+    "LICENSE"
+  ],
   "scripts": {
-    "start": "node src/cli.js"
+    "start": "node src/cli.js",
+    "test": "node scripts/test.js"
   },
   "engines": {
     "node": ">=18"

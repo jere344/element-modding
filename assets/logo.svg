@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Element Mods logo">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0dbd8b"/>
+      <stop offset="1" stop-color="#6c5ce7"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#g)"/>
+  <!-- speech bubble -->
+  <path d="M60 64h136a16 16 0 0 1 16 16v76a16 16 0 0 1-16 16h-72l-40 32v-32H60a16 16 0 0 1-16-16V80a16 16 0 0 1 16-16z" fill="#fff"/>
+  <!-- puzzle-ish plug: "mod" notch -->
+  <path d="M104 104l-20 22 20 22M152 104l20 22-20 22M136 98l-16 56" fill="none" stroke="#4b3fc4" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

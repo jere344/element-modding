@@ -1,9 +1,26 @@
-# Element Mods
+<p align="center">
+  <img src="assets/logo.svg" width="96" alt="Element Mods logo">
+</p>
 
-A small mod manager for the [Element](https://element.io/) (Matrix) desktop client.
-It patches the app's bundled webapp to load a set of JavaScript mods (patches),
-a bit like Vencord does for Discord.
+<h1 align="center">Element Mods</h1>
 
+<p align="center">
+  Vencord-style mods for the <a href="https://element.io/">Element</a> (Matrix) desktop client.<br>
+  Pick a patch, apply, restart. Undo any time.
+</p>
+
+<p align="center">
+  <a href="https://github.com/jere344/element-modding/actions/workflows/ci.yml"><img src="https://github.com/jere344/element-modding/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license"></a>
+  <img src="https://img.shields.io/badge/node-%E2%89%A518-blue" alt="Node 18+">
+</p>
+
+---
+
+Element Mods patches the app's bundled webapp to load a set of JavaScript mods.
+Everything is local: no telemetry, no server, and every change can be reverted with one command.
+
+> Unofficial project, not affiliated with Element or the Matrix.org Foundation.
 
 ## Requirements
 
@@ -41,6 +58,12 @@ sudo node src/cli.js restore      # restore the original webapp
 ## Available patches
 
 Click a patch to see its description.
+
+<details>
+<summary><b>Autocorrect</b></summary>
+
+LanguageTool-style spelling and grammar checker for the message composer. Mistakes are underlined (red for spelling, blue for grammar); click one for suggestions, **Ignore** or **Disable rule**. It works with any LanguageTool-compatible backend, either your own server or the official API, configured in **Settings -> Autocorrect**.
+</details>
 
 <details>
 <summary><b>Force User Status</b></summary>
@@ -159,8 +182,21 @@ Theme engine modeled after Vencord's theme system: apply and manage custom CSS t
 
 </details>
 
+## Development
+
+```sh
+npm install
+npm test        # validates manifests and runs patch self-checks
+```
+
+Patches live in `patches/<id>/` (a `manifest.json` plus an `index.js`). See [CONTRIBUTING.md](CONTRIBUTING.md) to write your own.
+
 ## Uninstall
 
 ```sh
 sudo node src/cli.js restore
 ```
+
+## License
+
+[MIT](LICENSE)

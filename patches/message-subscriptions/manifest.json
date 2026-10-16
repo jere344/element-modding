@@ -3,6 +3,6 @@
   "name": "Message Subscriptions",
   "description": "Creates local-only subscription channels that gather every message containing a word you choose from a channel you choose. Configure subscriptions in Settings -> Subscriptions; each one appears as a button in the left sidebar (below pinned rooms) that opens a live view of the matching messages.",
   "version": "1.0.0",
-  "author": "you",
+  "author": "jere344",
   "main": "index.js"
 }

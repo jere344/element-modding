@@ -3,6 +3,6 @@
   "name": "No Quick Settings",
   "description": "Removes the quick settings menu. Clicking the settings gear (bottom of the space panel) opens the full Settings page directly.",
   "version": "1.0.0",
-  "author": "you",
+  "author": "jere344",
   "main": "index.js"
 }

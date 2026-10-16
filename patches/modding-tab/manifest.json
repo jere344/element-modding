@@ -3,7 +3,7 @@
   "name": "Modding Tab",
   "description": "Adds a 'Modding' tab to the Settings dialog showing the mod platform version and the list of active patches.",
   "version": "1.0.0",
-  "author": "you",
+  "author": "jere344",
   "required": true,
   "main": "index.js"
 }

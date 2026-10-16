@@ -1,0 +1,8 @@
+{
+  "id": "autocorrect",
+  "name": "Autocorrect",
+  "description": "LanguageTool-style grammar and spelling checker for the message composer. Works with any LanguageTool-compatible backend (custom or the official one).",
+  "version": "1.0.0",
+  "author": "jere344",
+  "main": "index.js"
+}

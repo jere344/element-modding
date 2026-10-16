@@ -3,6 +3,6 @@
   "name": "Themes",
   "description": "Theme engine modeled after Vencord's theme system: apply and manage custom CSS themes (bundled, added by URL, pasted, or generated from an uploaded image).",
   "version": "1.0.0",
-  "author": "you",
+  "author": "jere344",
   "main": "index.js"
 }
