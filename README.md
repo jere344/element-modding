@@ -66,6 +66,12 @@ LanguageTool-style spelling and grammar checker for the message composer. Mistak
 </details>
 
 <details>
+<summary><b>Custom Keybinds</b></summary>
+
+Makes Element's built-in keyboard shortcuts rebindable directly in **Settings -> Keyboard**: each shortcut row gains **Edit** (press a new key combination to record it) and **Reset** buttons, plus a **Reset all to defaults** control. Overrides apply immediately by updating Element's own shortcut table and are stored locally; no defaults are changed until you rebind something yourself. For example, you can bind **Cmd+H** to *Go to home view* — while Element is focused the keypress is consumed by the renderer, so macOS's native **Hide Element** menu accelerator never fires (Hide remains available from the menu).
+</details>
+
+<details>
 <summary><b>Force User Status</b></summary>
 
 Force-enables Element's built-in **MSC4426 User Status** feature (the emoji/text status row in your user menu and the status editor in Settings) even when your homeserver does not advertise support for the `org.matrix.msc4429` unstable feature it requires. Element silently force-disables that feature on servers that don't support it, so the setting alone does nothing — this patch bypasses the server-support check. Restart is recommended after enabling.

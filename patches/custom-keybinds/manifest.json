@@ -1,0 +1,8 @@
+{
+  "id": "custom-keybinds",
+  "name": "Custom Keybinds",
+  "description": "Makes Element's built-in keyboard shortcuts rebindable from Settings -> Keyboard: record a new combo per shortcut and reset individually or all at once. Overrides are stored locally and applied to Element's own shortcut table.",
+  "version": "2.0.0",
+  "author": "Quix",
+  "main": "index.js"
+}
